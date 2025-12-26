@@ -5,6 +5,17 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 ## [1.0.0] - 2025-12-04
 
 ### ✨ Nuevas Características (Features)
+- **Generador de Cartones Completo**:
+  - Algoritmo de generación para N cartones únicos.
+  - Generación automática de 50 cartones al iniciar.
+  - Persistencia de estado al cerrar/abrir el panel.
+- **Descarga Individual de Cartones**:
+  - Botón "Al portapapeles" para compartir rápido (WhatsApp Web).
+  - Botón "Al computador" para guardar PNG en alta resolución.
+  - Corrección de sincronización de ID (espera de renderizado).
+  - Estilo visual unificado (Verde Esmeralda) para todas las acciones de descarga.
+
+### [1.0.0] - 2025-12-04 ([Legacy])
 - **Balotera 3D**: Implementación de una esfera 3D con animación de rotación interna para el sorteo de números.
 - **Captura de Imagen**: Funcionalidad "Enviar Tablero" y "Enviar Figura" utilizando `html-to-image` para generar imágenes limpias y recortadas.
 - **Figura a Jugar**: Nueva sección con cuadrícula 5x5 interactiva para definir patrones de victoria.

@@ -38,7 +38,10 @@ export const useBingoGame = () => {
         }
     }, [gameState.lastNumber, isSpinning]);
 
-    const drawBall = (showToast: (msg: string) => void) => {
+    const drawBall = (
+        showToast: (msg: string) => void,
+        callbacks?: { onSpin?: () => void, onDraw?: (num: number) => void }
+    ) => {
         if (gameState.calledNumbers.length >= TOTAL_NUMBERS) {
             showToast("¡Se han sacado todas las balotas!");
             return;
@@ -53,6 +56,7 @@ export const useBingoGame = () => {
         if (isSpinning) return;
 
         setIsSpinning(true);
+        callbacks?.onSpin?.();
 
         let nextNum: number;
         do {
@@ -77,6 +81,8 @@ export const useBingoGame = () => {
                 lastNumber: nextNum,
                 timestamp: Date.now()
             }));
+
+            callbacks?.onDraw?.(nextNum);
         }, 3000);
     };
 
@@ -95,7 +101,11 @@ export const useBingoGame = () => {
         setPendingNumber(null);
     };
 
-    const togglePatternCell = (index: number, showToast: (msg: string) => void) => {
+    const togglePatternCell = (
+        index: number,
+        showToast: (msg: string) => void,
+        onToggle?: () => void
+    ) => {
         const isGameStarted = gameState.calledNumbers.length > 0;
         const isLocked = isGameStarted || isSpinning;
 
@@ -106,6 +116,7 @@ export const useBingoGame = () => {
         const newPattern = [...gameState.pattern];
         newPattern[index] = !newPattern[index];
         setGameState(prev => ({ ...prev, pattern: newPattern }));
+        onToggle?.();
     };
 
     return {

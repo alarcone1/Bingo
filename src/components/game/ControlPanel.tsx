@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Minus, Plus, Sun, Moon, Trash2, RotateCcw } from 'lucide-react';
+import { Sparkles, Minus, Plus, Sun, Moon, Trash2, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 
 interface ControlPanelProps {
     darkMode: boolean;
@@ -9,9 +9,11 @@ interface ControlPanelProps {
     bgParticleCount: number;
     setBgParticleCount: (count: number) => void;
     bgSpeedMultiplier: number;
-    setBgSpeedMultiplier: (speed: number) => void;
+    setBgSpeedMultiplier: (n: number) => void;
     confirmReset: boolean;
     handleResetClick: () => void;
+    isMuted: boolean;
+    toggleMute: () => void;
 }
 
 export const ControlPanel: React.FC<ControlPanelProps> = ({
@@ -24,15 +26,14 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     bgSpeedMultiplier,
     setBgSpeedMultiplier,
     confirmReset,
-    handleResetClick
+    handleResetClick,
+    isMuted,
+    toggleMute
 }) => {
     return (
         <header className="flex flex-wrap justify-between items-center px-2 gap-4 relative z-50">
             <div className="flex items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-3">
-                    <div className="p-3 bg-gradient-to-br from-rose-400 to-fuchsia-500 rounded-2xl shadow-lg text-white">
-                        <Sparkles size={24} />
-                    </div>
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-rose-700 to-fuchsia-700">
                             Bingo ELY
@@ -108,6 +109,23 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             </div>
 
             <div className="flex items-center gap-3">
+                {/* Mute Toggle */}
+                <button
+                    onClick={toggleMute}
+                    className={`
+                w-10 h-10 rounded-full flex items-center justify-center border transition-all hover:scale-105 active:scale-95
+                ${false // Always use standard style unless we want a specific separate active state styling concept
+                            ? ''
+                            : (darkMode
+                                ? 'bg-slate-800 text-rose-300 border-slate-700 hover:bg-slate-700 shadow-lg'
+                                : 'bg-white/60 text-rose-600 border-white/50 hover:bg-white/80 shadow-sm')
+                        }
+            `}
+                    title={isMuted ? "Activar Sonido" : "Silenciar"}
+                >
+                    {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                </button>
+
                 {/* Dark Mode Toggle */}
                 <button
                     onClick={toggleDarkMode}

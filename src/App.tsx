@@ -10,10 +10,12 @@ import {
   Send,
   Lock,
   LockOpen,
-  AlertCircle
+  AlertCircle,
+  Table
 } from 'lucide-react';
 
 import { useBingoGame } from './hooks/useBingoGame';
+import { useSoundEffects } from './hooks/useSoundEffects';
 import { BackgroundAnimation } from './components/layout/BackgroundAnimation';
 import { ControlPanel } from './components/game/ControlPanel';
 import { MasterBoard } from './components/game/MasterBoard';
@@ -22,7 +24,9 @@ import { PatternGrid } from './components/game/PatternGrid';
 import { HistoryList } from './components/game/HistoryList';
 import { GlassCard } from './components/ui/GlassCard';
 import { ActionButton } from './components/ui/ActionButton';
+import { GeneratorPanel } from './components/generator/GeneratorPanel';
 import { getColIndex, COLUMN_THEME, DARK_MODE_KEY } from './utils/constants';
+import { BingoCard, generateBatch } from './utils/generator';
 
 export default function App() {
   const [resetKey, setResetKey] = useState(0);
@@ -42,6 +46,12 @@ export default function App() {
   const [bgSpeedMultiplier, setBgSpeedMultiplier] = useState(0.8);
 
   const [confirmReset, setConfirmReset] = useState(false);
+  const [showGenerator, setShowGenerator] = useState(false);
+
+  // Generator State Lifted
+  const [count, setCount] = useState<number>(50);
+  const [startId, setStartId] = useState<number>(1);
+  const [cards, setCards] = useState<BingoCard[]>(() => generateBatch(50, 1)); // Init on load
 
   const showToast = (message: string) => {
     setToast({ message, visible: true });
@@ -57,6 +67,11 @@ export default function App() {
     resetGame,
     togglePatternCell
   } = useBingoGame();
+
+  // Sound Effects Hook
+  const { isMuted, setIsMuted, speak, playSpin, playPop } = useSoundEffects();
+
+  const toggleMute = () => setIsMuted(!isMuted);
 
   // --- Effects ---
   useEffect(() => {
@@ -92,11 +107,19 @@ export default function App() {
   };
 
   const handleDrawBall = () => {
-    drawBall(showToast);
+    drawBall(showToast, {
+      onSpin: playSpin,
+      onDraw: (num) => {
+        // Format for speech: "B 5" -> "Be cinco"
+        const col = getColIndex(num);
+        const letter = ['B', 'I', 'N', 'G', 'O'][col];
+        speak(`${letter} ${num}`);
+      }
+    });
   };
 
   const handleTogglePattern = (index: number) => {
-    togglePatternCell(index, showToast);
+    togglePatternCell(index, showToast, playPop);
   };
 
   const handleCapture = async (elementId: string, name: string) => {
@@ -222,7 +245,22 @@ export default function App() {
           setBgSpeedMultiplier={setBgSpeedMultiplier}
           confirmReset={confirmReset}
           handleResetClick={handleResetClick}
+          isMuted={isMuted}
+          toggleMute={toggleMute}
         />
+
+        {showGenerator && (
+          <GeneratorPanel
+            darkMode={darkMode}
+            onClose={() => setShowGenerator(false)}
+            cards={cards} // Pass state
+            setCards={setCards}
+            count={count}
+            setCount={setCount}
+            startId={startId}
+            setStartId={setStartId}
+          />
+        )}
 
         {/* Main Grid Layout - 3 Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -398,6 +436,14 @@ export default function App() {
                 </button>
               </div>
             </GlassCard>
+
+            <div className="mt-4 w-full">
+              <ActionButton
+                onClick={() => setShowGenerator(true)}
+                label="CARTONES"
+                icon={<Table size={24} />}
+              />
+            </div>
           </div>
 
         </div>
